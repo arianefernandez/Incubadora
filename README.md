@@ -72,11 +72,11 @@ virtualenv --python "c:\python36\python.exe" env
 
 Para ejecutar emocion.py es necesario rellenar tal como se indica en el tutorial de (https://cloud.google.com/vision/):
 
-   # project_id = 'PROJECT_ID_HERE'
-   # compute_region = 'COMPUTE_REGION_HERE'
-   # model_id = 'MODEL_ID_HERE'
-   # file_path = '/local/path/to/file'
-   # score_threshold = 'float from 0.0 to 0.5'
+    project_id = 'PROJECT_ID_HERE'
+    compute_region = 'COMPUTE_REGION_HERE'
+    model_id = 'MODEL_ID_HERE'
+    file_path = '/local/path/to/file'
+    score_threshold = 'float from 0.0 to 0.5'
 
 Hay que recordar introducir las credenciales
 

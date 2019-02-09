@@ -44,6 +44,8 @@ de la API (https://cloud.google.com/vision/). Este modelo cuenta con dos emocion
 De momento es para la detección de una emocion a través de una imagen, cuya ruta se especifica, pero haré una actualización
 para cambiar dicho funcionamiento.
 
+### Preparacion
+
 Para hacer uso de la libreria debemos asegurarnos de que estamos usando `Python 3`:
 
 python --version

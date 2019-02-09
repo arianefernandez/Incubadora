@@ -36,7 +36,7 @@ Si la instalacion de simpleaudio nos ha dado problemas tras ejecutar el comando 
 
 sudo -H pip3 install simpleaudio
 
-#Using Google Cloud MLVision Beta
+# Using Google Cloud MLVision Beta
 
 **Nota2:**He añadido y modificado una libreria de (https://cloud.google.com/) para el reconocimiento facial de emociones. 
 Ya que se deben detectar emociones de neonatales, he creado un modelo personalizado con la herramienta beta AUTOML Vision 

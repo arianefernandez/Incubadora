@@ -1,6 +1,21 @@
 from miband2 import MiBand2
+from apscheduler.schedulers.blocking import BlockingScheduler
+from emocion import predecirEmocion
+import threading
+import time
 
-def main():
+def obtenerEmocion():
+    emocion = predecirEmocion()
+    emocion.fotografiar()
+    emocion.predict()
+    
+def Hilo1():
+    scheduler = BlockingScheduler()
+    scheduler.add_job(obtenerEmocion, 'interval', minutes=1)
+    scheduler.start()
+
+
+def Hilo2():
     print('Connecting')
     band = MiBand2('FA:01:FB:63:6A:75')
     band.setSecurityLevel(level="medium")
@@ -20,6 +35,10 @@ def main():
     del band
     
 if __name__ == "__main__":
-    main()
+    h=threading.Thread(target=Hilo1)
+    h2=threading.Thread(target=Hilo2)
+    h.start()
+    h2.start()
+   
 
 

@@ -6,55 +6,79 @@ https://cloud.google.com/vision/automl/docs.
 
 import argparse
 import os
+import time
+import picamera
+from mcp3008 import MCP3008
 
+class predecirEmocion:
+    
+    def fotografiar(self):
+        camara = picamera.PiCamera()
+        camara.resolution = (2592, 1944)
+        camara.sharpness = 100
+        camara.capture('bebe.jpg')
+        camara.close()
 
-def predict():
-    """Make a prediction for an image."""
-    project_id = ''
-    compute_region = ''
-    model_id = ''
-    file_path = ''
-    score_threshold = ''
+    def predict(self):
+        """Make a prediction for an image."""
+        project_id = 'incubadora-46527'
+        compute_region = 'us-central1'
+        model_id = 'ICN990830527828411926'
+        file_path = '/home/pi/Scripts/Incubadora-master/bebe.jpg'
+        score_threshold = '0.0'
 
-    from google.cloud import automl_v1beta1 as automl
+        from google.cloud import automl_v1beta1 as automl
 
-    automl_client = automl.AutoMlClient()
+        automl_client = automl.AutoMlClient()
 
-    # Get the full path of the model.
-    model_full_id = automl_client.model_path(
-        project_id, compute_region, model_id
-    )
+        # Get the full path of the model.
+        model_full_id = automl_client.model_path(
+            project_id, compute_region, model_id
+        )
+    
+        # Create client for prediction service.
+        prediction_client = automl.PredictionServiceClient()
+    
+        # Read the image and assign to payload.
+        with open(file_path, "rb") as image_file:
+            content = image_file.read()
+        payload = {"image": {"image_bytes": content}}
 
-    # Create client for prediction service.
-    prediction_client = automl.PredictionServiceClient()
+        # params is additional domain-specific parameters.
+        # score_threshold is used to filter the result
+        # Initialize params
+        params = {}
+        if score_threshold:
+            params = {"score_threshold": score_threshold}
 
-    # Read the image and assign to payload.
-    with open(file_path, "rb") as image_file:
-        content = image_file.read()
-    payload = {"image": {"image_bytes": content}}
-
-    # params is additional domain-specific parameters.
-    # score_threshold is used to filter the result
-    # Initialize params
-    params = {}
-    if score_threshold:
-        params = {"score_threshold": score_threshold}
-
-    response = prediction_client.predict(model_full_id, payload, params)
-    print("Resultado:")
-    for result in response.payload:
-        if 'Bienestar' in result.display_name:
-            bienestar=result.classification.score
+        response = prediction_client.predict(model_full_id, payload, params)
+        print("Resultado:")
+        for result in response.payload:
+            if 'Bienestar' in result.display_name:
+                bienestar=result.classification.score
+            else:
+                llanto=result.classification.score
+            
+        total=bienestar+llanto
+        porcentajeB=bienestar*60/total
+        porcentajeL=llanto*60/total
+        
+        mcp = MCP3008(0,0)
+        ruido = mcp.leer(0)
+    
+        if(ruido > 300):
+                porcentajeL=porcentajeL+40
         else:
-            llanto=result.classification.score
-    if(llanto > bienestar):
-        print("El bebe esta llorando")
-    else:
-        print("El bebe se encuentra en un estado de bienestar")
+                porcentajeL=porcentajeL-40
+    
+        if(porcentajeL > porcentajeB):
+            print("El bebe esta llorando")
+        else:
+            print("El bebe se encuentra en un estado de bienestar")
         
     # [END automl_vision_predict]
 
 
-if __name__ == "__main__":
-    
-        predict()
+
+       
+        

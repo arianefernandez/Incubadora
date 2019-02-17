@@ -5,6 +5,7 @@ quién también ha escrito un artículo interesante sobre mi Band: [Mi Band 2, P
 
 Por otro lado incluye una modificacion desarrollada por [Ariane Fernandez] de dicha libreria, que añade un sistema de reproduccion de audio, que reproduce en tiempo real los latidos 
 que son recogidos a traves de la pulsera. Las clases main.py y pulsos.py, asi como los audios contenidos no formaban parte de la libreria original. 
+Por otro lado esta incluido el sistema de reconocimiento de emociones explicado en la `Nota2` que se ejecuta cada 15 minutos.
 
 ### Preparacion
 
@@ -13,7 +14,8 @@ bluetooth movil.
 
 Para hacer uso del pulsometro instalaremos `Python 3` y la libreria `bluepy`:
 
-pip install bluepy --user
+apt-get install python3-pip libglib2.0-dev
+pip3 install bluepy --user
 
 En este caso uso `Python 3` ya que la librería que vamos a utilizar para el audio solo est disponible en esta version.
 
@@ -36,15 +38,11 @@ Si la instalacion de simpleaudio nos ha dado problemas tras ejecutar el comando 
 
 sudo -H pip3 install simpleaudio
 
-# Using Google Cloud MLVision Beta
-
 **Nota2:**He añadido y modificado una libreria de (https://cloud.google.com/) para el reconocimiento facial de emociones. 
 Ya que se deben detectar emociones de neonatales, he creado un modelo personalizado con la herramienta beta AUTOML Vision 
 de la API (https://cloud.google.com/vision/). Este modelo cuenta con dos emociones, llanto y binestar. 
 De momento es para la detección de una emocion a través de una imagen, cuya ruta se especifica, pero haré una actualización
 para cambiar dicho funcionamiento.
-
-### Preparacion
 
 Para hacer uso de la libreria debemos asegurarnos de que estamos usando `Python 3`:
 
@@ -76,18 +74,18 @@ virtualenv --python "c:\python36\python.exe" env
 
 Para ejecutar emocion.py es necesario rellenar tal como se indica en el tutorial de (https://cloud.google.com/vision/):
 
-    project_id = 'PROJECT_ID_HERE'
-    compute_region = 'COMPUTE_REGION_HERE'
-    model_id = 'MODEL_ID_HERE'
-    file_path = '/local/path/to/file'
-    score_threshold = 'float from 0.0 to 0.5'
+   # project_id = 'PROJECT_ID_HERE'
+   # compute_region = 'COMPUTE_REGION_HERE'
+   # model_id = 'MODEL_ID_HERE'
+   # file_path = '/local/path/to/file'
+   # score_threshold = 'float from 0.0 to 0.5'
 
 Hay que recordar introducir las credenciales
 
 su
 export GOOGLE_APPLICATION_CREDENTIALS=filename.json
 
-python emocion.py
+
 
 
 

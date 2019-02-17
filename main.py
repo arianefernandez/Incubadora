@@ -11,7 +11,7 @@ def obtenerEmocion():
     
 def Hilo1():
     scheduler = BlockingScheduler()
-    scheduler.add_job(obtenerEmocion, 'interval', minutes=1)
+    scheduler.add_job(obtenerEmocion, 'interval', minutes=15)
     scheduler.start()
 
 

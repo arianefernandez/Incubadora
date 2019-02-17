@@ -1,4 +1,4 @@
-# Mi Band + reproduccion de pulso
+# Mi Band + reproducción de pulso
 
 **Nota:**La carpeta actual contiene la librería desarrollada por [Leo Soares](https://github.com/leojrfs/miband2) 
 quién también ha escrito un artículo interesante sobre mi Band: [Mi Band 2, Part 1: Authentication](https://leojrfs.github.io/writing/miband2-part1-auth/).

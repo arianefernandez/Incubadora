@@ -8,9 +8,10 @@ import argparse
 import os
 import time
 import picamera
-from mcp3008 import MCP3008
 
 class predecirEmocion:
+    
+    global emocion
     
     def fotografiar(self):
         camara = picamera.PiCamera()
@@ -19,7 +20,7 @@ class predecirEmocion:
         camara.capture('bebe.jpg')
         camara.close()
 
-    def predict(self):
+    def predict(self, ruido):
         """Make a prediction for an image."""
         project_id = 'incubadora-46527'
         compute_region = 'us-central1'
@@ -52,7 +53,7 @@ class predecirEmocion:
             params = {"score_threshold": score_threshold}
 
         response = prediction_client.predict(model_full_id, payload, params)
-        print("Resultado:")
+        #print("Resultado:")
         for result in response.payload:
             if 'Bienestar' in result.display_name:
                 bienestar=result.classification.score
@@ -63,18 +64,19 @@ class predecirEmocion:
         porcentajeB=bienestar*60/total
         porcentajeL=llanto*60/total
         
-        mcp = MCP3008(0,0)
-        ruido = mcp.leer(0)
-    
-        if(ruido > 300):
+        if(ruido > 200):
                 porcentajeL=porcentajeL+40
         else:
                 porcentajeL=porcentajeL-40
     
         if(porcentajeL > porcentajeB):
-            print("El bebe esta llorando")
+            #print("El bebe esta llorando")
+            emocion = "Llanto"
         else:
-            print("El bebe se encuentra en un estado de bienestar")
+            #print("El bebe se encuentra en un estado de bienestar")
+            emocion = "Bienestar"
+            
+        return emocion
         
     # [END automl_vision_predict]
 

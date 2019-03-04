@@ -10,6 +10,7 @@ import time
 
 bienestar = True
 ruido = 0
+luz = 0
 
 host = 'localhost'
 puerto = 8086
@@ -69,13 +70,26 @@ def obtenerRuido():
     mcp = MCP3008(0,0)
     global ruido
     ruido = mcp.leer(0)
+    ruido = (ruido + 40.24)/6.26
+    ruido = int(ruido)
     print(ruido)
-    if(ruido > 200):
+    if(ruido > 60):
         obtenerEmocion()
+
+def obtenerLuz():
+    mcp = MCP3008(0,0)
+    global luz
+    luz = mcp.leer(1)
+    print(luz)
         
 def HiloRuido():
     scheduler = BlockingScheduler()
     scheduler.add_job(obtenerRuido, 'interval', seconds=5)
+    scheduler.start()
+
+def HiloLuz():
+    scheduler = BlockingScheduler()
+    scheduler.add_job(obtenerLuz, 'interval', seconds=1)
     scheduler.start()
     
 def HiloBD():
@@ -91,7 +105,17 @@ def HiloBD():
               "fields": {
                 "value" : ruido,
                 }
-            }
+            },
+            {
+              "measurement": "luz",
+              "tags": {
+              },
+              "time": datetime.utcnow(),
+              "fields": {
+                "value" : luz,
+                }
+            },
+            
         ]
         cliente.write_points(data)
     
@@ -101,8 +125,9 @@ if __name__ == "__main__":
     h2=threading.Thread(target=HiloCorazon)
     h3=threading.Thread(target=HiloRuido)
     h4=threading.Thread(target=HiloBD)
+    h5=threading.Thread(target=HiloLuz)
     h.start()
     h2.start()
     h3.start()
     h4.start()
-   
+    h5.start()   

@@ -64,7 +64,7 @@ class predecirEmocion:
         porcentajeB=bienestar*60/total
         porcentajeL=llanto*60/total
         
-        if(ruido > 200):
+        if(ruido > 60):
                 porcentajeL=porcentajeL+40
         else:
                 porcentajeL=porcentajeL-40

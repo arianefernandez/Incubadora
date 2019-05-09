@@ -41,6 +41,8 @@ O bien podemos ejecutar utilizando el comando:
 Si la instalacion de simpleaudio nos ha dado problemas tras ejecutar el comando citado anteriormente ejecutaremos las siguientes lineas:
 
     sudo -H pip3 install simpleaudio
+    
+# Reconocimiento de emociones
 
 **Nota2:**He añadido y modificado una libreria de (https://cloud.google.com/) para el reconocimiento facial de emociones. 
 Ya que se deben detectar emociones de neonatales, he creado un modelo personalizado con la herramienta beta AUTOML Vision 
@@ -89,9 +91,6 @@ Hay que recordar introducir las credenciales
     sudo -i
     export GOOGLE_APPLICATION_CREDENTIALS=filename.json
 
-Respecto a la aplicación web de Heroku, para usar la piCamera hay que usar el siguiente comando
-
-    sudo modprobe bcm2835-v4l2
     
 
 

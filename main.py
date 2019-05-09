@@ -149,10 +149,10 @@ def obtenerTemperaturaHumedad():
     else:
         GPIO.output(pinR, GPIO.HIGH)
         
-    #if(humedad>70):
-        #GPIO.output(pinR2, GPIO.HIGH)
-    #else:
-        #GPIO.output(pinR2, GPIO.LOW)
+    if(humedad>70):
+        GPIO.output(pinR2, GPIO.HIGH)
+    else:
+        GPIO.output(pinR2, GPIO.LOW)
 
 def HiloBD():
     while True:

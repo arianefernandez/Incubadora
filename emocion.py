@@ -7,18 +7,21 @@ https://cloud.google.com/vision/automl/docs.
 import argparse
 import os
 import time
-import picamera
+from cv2 import *
 
 class predecirEmocion:
     
     global emocion
     
     def fotografiar(self):
-        camara = picamera.PiCamera()
-        camara.resolution = (2592, 1944)
-        camara.sharpness = 100
-        camara.capture('bebe.jpg')
-        camara.close()
+        captura = cv2.VideoCapture(-1)
+        NombreImagen = 'bebe.jpg'
+        directorio = os.path.join('/home/pi/Scripts/Incubadora-master/' + NombreImagen)
+        captura.set(cv2.CAP_PROP_FRAME_WIDTH, 1280)
+        captura.set(cv2.CAP_PROP_FRAME_HEIGHT, 1024)
+        ret, frame = captura.read() 
+        frame = cv2.resize(frame, (640, 480)) 
+        cv2.imwrite(directorio, frame)
 
     def predict(self, ruido):
         """Make a prediction for an image."""
@@ -53,7 +56,7 @@ class predecirEmocion:
             params = {"score_threshold": score_threshold}
 
         response = prediction_client.predict(model_full_id, payload, params)
-        #print("Resultado:")
+     
         for result in response.payload:
             if 'Bienestar' in result.display_name:
                 bienestar=result.classification.score
@@ -70,10 +73,8 @@ class predecirEmocion:
                 porcentajeL=porcentajeL-40
     
         if(porcentajeL > porcentajeB):
-            #print("El bebe esta llorando")
             emocion = "Llanto"
         else:
-            #print("El bebe se encuentra en un estado de bienestar")
             emocion = "Bienestar"
             
         return emocion

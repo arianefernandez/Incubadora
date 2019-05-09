@@ -221,6 +221,8 @@ if __name__ == "__main__":
         h4=threading.Thread(target=HiloCalidadAire)
         h.start()
         h2.start()
-	h3.start()
-	h4.start()
+        h3.start()
+        h4.start()
+    except KeyboardInterrupt:
+        GPIO.cleanup()
     

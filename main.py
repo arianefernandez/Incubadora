@@ -8,18 +8,30 @@ from mcp3008 import MCP3008
 import RPi.GPIO as GPIO
 import threading
 import time
+import sys
+import Adafruit_DHT
+
+mcp = MCP3008(0,0)
+
+pinR = 17
+pinR2 = 27
+pinA = 18
+pinDHT = 4
+sensor = 11
 
 bienestar = True
 ruido = 0
 luz = 0
-pin = 18
-duracion = 0
-ocupacion = 0
-ratio = 0
 concentracion = 0
+temperatura = 0
+humedad = 0
+
 inicio = 0
 tiempo = 30000
 milis = 0
+duracion = 0
+ocupacion = 0
+ratio = 0
 
 host = 'localhost'
 puerto = 8086
@@ -38,15 +50,16 @@ except:
 def setup():
     GPIO.setmode(GPIO.BCM)
     GPIO.setwarnings(False)
-    global pin
-    GPIO.setup(pin, GPIO.IN)
+    global pinA
+    global pinR
+    GPIO.setup(pinA, GPIO.IN)
+    GPIO.setup(pinR, GPIO.OUT)
     
 
 def HiloCalidadAire():
-    setup()
     while True:
         global duracion
-        duracion = GPIO.input(pin)
+        duracion = GPIO.input(pinA)
         global ocupacion
         ocupacion = ocupacion + duracion
         
@@ -74,11 +87,6 @@ def obtenerEmocion():
     else:
         bienestar=True
         
-def HiloEmociones():
-    scheduler = BlockingScheduler()
-    scheduler.add_job(obtenerEmocion, 'interval', minutes=2)
-    scheduler.start()
-
 def HiloCorazon():
     print('Connecting')
     band = MiBand2('FA:01:FB:63:6A:75')
@@ -104,36 +112,55 @@ def HiloCorazon():
     del band
     
 def obtenerRuido():
-    mcp = MCP3008(0,0)
+    global mcp
     global ruido
     ruido = mcp.leer(0)
-    ruido = (ruido + 40.24)/6.26
+    ruido = (ruido + 192.8) / 10.94
     ruido = int(ruido)
     if(ruido > 60):
         obtenerEmocion()
 
 def obtenerLuz():
-    mcp = MCP3008(0,0)
+    global mcp
     global luz
     luz = mcp.leer(1)
-    luz = (luz * 207)/618
+    luz = (luz * 207) / 618
     luz = int(luz)
-        
-def HiloRuido():
+  
+def HiloERLT():
     scheduler = BlockingScheduler()
-    scheduler.add_job(obtenerRuido, 'interval', seconds=10)
+    scheduler.add_job(obtenerEmocion, 'interval', minutes=2)
+    scheduler.add_job(obtenerTemperaturaHumedad, 'interval', seconds=30)
+    scheduler.add_job(obtenerRuido, 'interval', seconds=20)
+    scheduler.add_job(obtenerLuz, 'interval', seconds=10)
     scheduler.start()
 
-def HiloLuz():
-    scheduler = BlockingScheduler()
-    scheduler.add_job(obtenerLuz, 'interval', seconds=5)
-    scheduler.start()
+def obtenerTemperaturaHumedad():
+    global pinR
+    global humedad
+    global temperatura
     
+    humedad, temperatura = Adafruit_DHT.read_retry(sensor, pinDHT)
+    humedad = int(humedad)
+    temperatura = int(temperatura)
+    
+    if(temperatura<37):
+        GPIO.output(pinR, GPIO.LOW)
+    else:
+        GPIO.output(pinR, GPIO.HIGH)
+        
+    #if(humedad>70):
+        #GPIO.output(pinR2, GPIO.HIGH)
+    #else:
+        #GPIO.output(pinR2, GPIO.LOW)
+
 def HiloBD():
     while True:
         global ruido
         global luz
         global concentracion
+        global temperatura
+        global humedad
         global cliente
         data = [
             {
@@ -162,23 +189,38 @@ def HiloBD():
               "fields": {
                 "value" : concentracion,
                 }
+            },    
+             {
+              "measurement": "temperatura",
+              "tags": {
+              },
+              "time": datetime.utcnow(),
+              "fields": {
+                "value" : temperatura,
+                }
+            },
+             {
+              "measurement": "humedad",
+              "tags": {
+              },
+              "time": datetime.utcnow(),
+              "fields": {
+                "value" : humedad,
+                }
             },
             
         ]
         cliente.write_points(data)
     
-    
 if __name__ == "__main__":
-    h=threading.Thread(target=HiloEmociones)
-    h2=threading.Thread(target=HiloCorazon)
-    h3=threading.Thread(target=HiloRuido)
-    h4=threading.Thread(target=HiloBD)
-    h5=threading.Thread(target=HiloLuz)
-    h6=threading.Thread(target=HiloCalidadAire)
-    h.start()
-    h2.start()
-    h3.start()
-    h4.start()
-    h5.start()
-    h6.start()
+    try:
+        setup()
+        h=threading.Thread(target=HiloERLT)
+        h2=threading.Thread(target=HiloCorazon)
+        h3=threading.Thread(target=HiloBD)
+        h4=threading.Thread(target=HiloCalidadAire)
+        h.start()
+        h2.start()
+	h3.start()
+	h4.start()
     

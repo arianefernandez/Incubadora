@@ -52,10 +52,11 @@ def setup():
     GPIO.setwarnings(False)
     global pinA
     global pinR
+    global pinR2
     GPIO.setup(pinA, GPIO.IN)
     GPIO.setup(pinR, GPIO.OUT)
+    GPIO.setup(pinR2, GPIO.OUT)
     
-
 def HiloCalidadAire():
     while True:
         global duracion
@@ -132,11 +133,12 @@ def HiloERLT():
     scheduler.add_job(obtenerEmocion, 'interval', minutes=2)
     scheduler.add_job(obtenerTemperaturaHumedad, 'interval', seconds=30)
     scheduler.add_job(obtenerRuido, 'interval', seconds=20)
-    scheduler.add_job(obtenerLuz, 'interval', seconds=10)
+    scheduler.add_job(obtenerLuz, 'interval',seconds=10)
     scheduler.start()
 
 def obtenerTemperaturaHumedad():
     global pinR
+    global pinR2
     global humedad
     global temperatura
     
@@ -149,7 +151,7 @@ def obtenerTemperaturaHumedad():
     else:
         GPIO.output(pinR, GPIO.HIGH)
         
-    if(humedad>70):
+    if(humedad<70):
         GPIO.output(pinR2, GPIO.HIGH)
     else:
         GPIO.output(pinR2, GPIO.LOW)
@@ -225,4 +227,3 @@ if __name__ == "__main__":
         h4.start()
     except KeyboardInterrupt:
         GPIO.cleanup()
-    
